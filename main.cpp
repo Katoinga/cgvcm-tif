@@ -226,6 +226,7 @@ int main()
 
     float h = 0.0002;
     float time=0;
+    int count2=0;
 
     int cont= 0;
     // OBJ
@@ -296,14 +297,60 @@ int main()
             vertices[i] = vertices[i] + velocities[0]*(time/2);
         }*/
         // euler punto medio gravedad en diagonal hacia adelante y abajo
+        vec3 velocity;
+        float k = 1.0f;
+        float damping = 0.1f;
+        float dt = 0.01f;
+        /*
          for (int i=0;i<vertices.size();i++){
             auto halfpos = vertices[i] + velocities[0]*(time/2);
             vertices[i] = vertices[i] + velocities[0]+time*halfpos;
+
+        }*/
+         //spring and dampers
+        if (count2 < mass.size()){
+        count2++;
+         for (int i=0;i<vertices.size();i++){
+
+                 vec3 gravity = vec3(0, -0.98, 0)*dt;
+                 vec3 spring = gravity*(vec3(0,0,0))*k*dt;
+                 vec3 dampingForce = velocity*damping;
+
+                 //Calculate velocity
+                 vec3 acceleration = (gravity+spring-dampingForce)/mass[1];
+                 velocity += acceleration;
+                 vertices[i] += velocity;
+
+
+         }
         }
+        else if (count2 >=mass.size()){
+            count2=0;
+            for (int i=0;i<vertices.size();i++){
+
+                    vec3 gravity = vec3(0, -0.98, 0)*dt;
+                    vec3 spring = gravity*(vec3(0,0,0))*k*dt;
+                    vec3 dampingForce = velocity*damping;
+
+                    //Calculate velocity
+                    vec3 acceleration = (gravity+spring-dampingForce)/mass[1];
+                    velocity += acceleration;
+                    vertices[i] -= velocity;
+
+
+            }
+        }
+
+
+
+
         time+=h;
         cont++;
         //guardo frame
         WriteFrame(cont,vertices);
+
+
+
 
 
         glBufferData(GL_ARRAY_BUFFER, vector.size() * sizeof(float)  , &vertices[0], GL_STATIC_DRAW);
@@ -333,4 +380,5 @@ int main()
 
     return 0;
 }
+
 
