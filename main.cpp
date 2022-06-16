@@ -20,6 +20,7 @@ GLFWwindow* window;
 
 // Include GLM
 #include <glm/glm.hpp>
+#include "glm/ext.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
@@ -199,7 +200,7 @@ int main()
         return -1;
     }
     GLFWwindow* window;
-    window = glfwCreateWindow(800, 800, "Hello OpenGL", nullptr, nullptr);
+    window = glfwCreateWindow(700, 700, "Hello OpenGL", nullptr, nullptr);
 
     if(window == nullptr)
     {
@@ -220,7 +221,7 @@ int main()
     }
     std::vector<glm::vec3> velocities(3, glm::vec3(0,0,0));
 
-    std::vector<float> mass = {1, 2, 0.5};
+    std::vector<float> mass = {1, 0.05, 0.5};
 
     glm::vec3 gravity(0, -0.98, 0);
 
@@ -234,7 +235,7 @@ int main()
 
     //OBJFile obj("/home/emilio/lab2fin/gm.obj");
     //OBJFile obj("/home/emilio/lab2fin/attic.obj");
-    OBJFile obj("/home/emilio/lab2fin/cyber.obj");
+    OBJFile obj("//home/sergio/cgvcm-tif/cyber.obj");
     //OBJFile obj("/home/emilio/lab2fin/bunny.obj");
 
     std::vector<float> vector = obj.GetVertices();
@@ -277,6 +278,14 @@ int main()
 
 
 
+    //all objects
+    float cameraX = 0.f;
+    float cameraY = 0.f;
+    float cameraZ = 7.f;
+
+    int width, height;
+    glm::mat4 mMat, vMat, mvMat, pMat;
+    float angle=0;
     // Mantiene la ventana abierta, mientras el usuario no cierre la ventana
     while(!glfwWindowShouldClose(window))
     {
@@ -341,14 +350,47 @@ int main()
             }
         }
 
-
-
-
         time+=h;
         cont++;
         //guardo frame
-        WriteFrame(cont,vertices);
+        //WriteFrame(cont,vertices);
 
+
+        //Rotate camera
+
+        //Obtener las matrices
+        GLuint mvLoc    = glGetUniformLocation(shaderProgram, "mvMatrix");
+        GLuint projLoc  = glGetUniformLocation(shaderProgram, "projMatrix");
+
+
+        //Obtener la perspectiva actual
+        glfwGetFramebufferSize(window, &width, &height);
+        float aspect = static_cast<float>(width)/static_cast<float>(height);
+        pMat =  glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
+
+        //Obtener matriz modelo-vista
+        vMat = glm::translate(glm::mat4(1.f), glm::vec3(-cameraX, -cameraY, -cameraZ));
+
+        //Rotar cámara
+        glm::mat4 vRot  = glm::rotate(glm::mat4(1.f) , angle , glm::vec3(0, -1,0));
+        vMat =  vMat*vRot;
+
+        glm::mat4 mOrg = glm::translate(glm::mat4(1.f), glm::vec3(1.0f, -1.0f, 1.0f)); //offset
+        glm::mat4 mBack = glm::translate(glm::mat4(1.f), glm::vec3(-1.0f, 1.0f, -1.0f)); //offset
+
+        glm::mat4 mRot  = mBack*glm::rotate(mOrg, angle , glm::vec3(1  , 0, 0 ));
+
+        //aumentar el angulo y volver a 0 si se llega a 360
+        angle+=0.05;
+        if(angle>360) angle=0;
+
+        mMat = glm::translate(glm::mat4(1.f), glm::vec3(0.0, -2.0, 0.0))*mRot; //offset
+
+        mvMat = vMat * mMat;
+
+        glUniformMatrix4fv(mvLoc, 1, GL_FALSE,  glm::value_ptr(mvMat));
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE,  glm::value_ptr(pMat));
+        //Rotate camera
 
 
 
