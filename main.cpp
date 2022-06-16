@@ -173,6 +173,25 @@ void WriteFrame(unsigned fillPosition,std::vector<glm::vec3> vertices){
 
 
 }
+void drawWalls()
+{
+
+glColor3f(1,0,0);
+glPushMatrix();
+//glRotatef(0,0,0,1);
+//glScalef(2,1,2);
+glBegin(GL_QUADS);
+/* Floor */
+glVertex3f(-1,-1,-1);
+glVertex3f(-1,-1,1);
+glVertex3f(1,-1,1);
+glVertex3f(1,-1,-1);
+
+glEnd();
+
+glPopMatrix();
+
+}
 int main()
 {
     const char* vertexShaderSrc =
@@ -191,7 +210,7 @@ int main()
             "uniform mat4 mvMatrix;" // matriz de model-vista
             "uniform mat4 projMatrix;" //matriz de proyeccion
             "void main(){"
-                  "frag_color = vec4(0.5, 0.5, 0.0, 0.5);"
+                  "frag_color = vec4(0.5, 0.5, 0.5, 0.5);"
             "}";
 
 
@@ -230,14 +249,15 @@ int main()
     float h = 0.0002;
     float time=0;
     int count2=0;
+    int count3=0;
 
     int cont= 0;
     // OBJ
     //cambiar el path segun el file que se quiera leer
 
-    //OBJFile obj("/home/emilio/lab2fin/gm.obj");
+    OBJFile obj("../lab2fin/cyber.obj");
     //OBJFile obj("/home/emilio/lab2fin/attic.obj");
-    OBJFile obj("//home/sergio/cgvcm-tif/cyber.obj");
+    //OBJFile obj("//home/sergio/cgvcm-tif/cyber.obj");
     //OBJFile obj("/home/emilio/lab2fin/bunny.obj");
 
     std::vector<float> vector = obj.GetVertices();
@@ -319,7 +339,7 @@ int main()
 
         }*/
          //spring and dampers
-        if (count2 < mass.size()){
+        if (count2 < 6){
         count2++;
          for (int i=0;i<vertices.size();i++){
 
@@ -335,8 +355,9 @@ int main()
 
          }
         }
-        else if (count2 >=mass.size()){
-            count2=0;
+        else if (count2 >=6){
+            count3++;
+
             for (int i=0;i<vertices.size();i++){
 
                     vec3 gravity = vec3(0, -0.98, 0)*dt;
@@ -350,8 +371,11 @@ int main()
 
 
             }
+            if (count3>=6){
+                count2=0;
+            }
         }
-
+    //springs and dampers
         time+=h;
         cont++;
         //guardo frame
@@ -412,7 +436,7 @@ int main()
 
         //glDrawElements(GL_TRIANGLES,vector.size(),GL_UNSIGNED_INT, &edges[1]);
 
-
+        drawWalls();
         glfwSwapBuffers(window);
 
         glfwPollEvents();
