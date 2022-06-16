@@ -177,19 +177,21 @@ int main()
 {
     const char* vertexShaderSrc =
             "#version 400\n"
-            "in vec4 position;"
-            "void main()"
-            "{"
-                 "gl_Position = position;"
+            "in vec3 vp;"
+            "uniform mat4 mvMatrix;" // matriz de model-vista
+            "uniform mat4 projMatrix;" //matriz de proyeccion
+            "void main(){"
+                  "gl_Position = projMatrix * mvMatrix * vec4(vp, 1.0);"
             "}";
 
 
     const char* fragmentShaderSrc =
             "#version 400\n"
-            "out vec4 color;"
-            "void main()"
-            "{"
-                 "color = vec4(0.6, 0.5, 0.0, 1.0);"
+            "out vec4 frag_color;"
+            "uniform mat4 mvMatrix;" // matriz de model-vista
+            "uniform mat4 projMatrix;" //matriz de proyeccion
+            "void main(){"
+                  "frag_color = vec4(0.5, 0.5, 0.0, 0.5);"
             "}";
 
 
@@ -278,8 +280,8 @@ int main()
 
 
 
-    //all objects
-    float cameraX = 0.f;
+    //Valores de giro de la cámara
+    float cameraX = 2.f;
     float cameraY = 0.f;
     float cameraZ = 7.f;
 
