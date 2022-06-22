@@ -194,6 +194,7 @@ glPopMatrix();
 }
 int main()
 {
+    /*
     const char* vertexShaderSrc =
             "#version 400\n"
             "in vec3 vp;"
@@ -203,7 +204,56 @@ int main()
                   "gl_Position = projMatrix * mvMatrix * vec4(vp, 1.0);"
             "}";
 
+*/
 
+    const char* vertexShaderSrc =
+            "#version 400\n"
+            "uniform mat4 projMat;" //projection
+            "uniform mat4 mvMat;" // model-view
+
+            "layout (location=0) in vec3 vertPos;"
+            "layout (location=1) in vec3 vertNormal;"
+
+            "out vec4 varyingColor;"
+
+            "struct PositionalLight"
+            "{ vec4 ambient;"
+            "vec4 diffuse;"
+            "vec4 specular;"
+            "vec3 position;"
+            "};"
+
+            "struct Material"
+            "{ vec4 ambient;"
+            "vec4 diffuse;"
+            "vec4 specular;"
+            "float shininess;"
+            "};"
+
+
+            "uniform vec4 globalAmbient;"
+            "uniform PositionalLight light;"
+            "uniform Material material;"
+            "uniform mat4 norm_matrix;" // for transforming normals
+
+            "void main()"
+            "{"
+
+            "vec4 P = mvMat * vec4(vertPos,1.0);"
+
+            "vec3 N = normalize((norm_matrix * vec4(vertNormal,1.0)).xyz);"
+            "vec3 L = normalize(light.position - P.xyz);"
+            "vec3 V = normalize(-P.xyz);"
+            "vec3 R = reflect(-L,N);"
+
+            "vec3 ambient = ((globalAmbient * material.ambient) + (light.ambient * material.ambient)).xyz;"
+            "vec3 diffuse = light.diffuse.xyz * material.diffuse.xyz * max(dot(N,L), 0.0);"
+            "vec3 specular= material.specular.xyz * light.specular.xyz * pow(max(dot(R,V), 0.0f), material.shininess);"
+            "varyingColor = vec4((ambient + diffuse + specular), 1.0);"
+            "gl_Position = projMat*mvMat*vec4(vertPos, 1.0);"
+
+            "}";
+    /*
     const char* fragmentShaderSrc =
             "#version 400\n"
             "out vec4 frag_color;"
@@ -211,7 +261,18 @@ int main()
             "uniform mat4 projMatrix;" //matriz de proyeccion
             "void main(){"
                   "frag_color = vec4(0.5, 0.5, 0.5, 0.5);"
+            "}";*/
+
+    const char* fragmentShaderSrc =
+            "#version 400\n"
+            "out vec4 color;"
+            "in vec4 varyingColor;"
+            "void main()"
+            "{"
+            "color = varyingColor;"
             "}";
+
+
 
 
 
@@ -308,6 +369,39 @@ int main()
     int width, height;
     glm::mat4 mMat, vMat, mvMat, pMat;
     float angle=0;
+
+    //projection
+
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    float aspect =static_cast<float>(width)/static_cast<float>(height);
+    glm::mat4 projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
+    GLuint projLoc = glGetUniformLocation(shaderProgram, "projMat");
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMat));
+
+    //light
+
+
+    // SILVER material - ambient, diffuse, specular, and shininess
+    //material
+    float matAmbSilver[4] = {0.1923f, 0.1923f, 0.1923f, 1}; //RGB-A
+    float matDifSilver[4] = {0.5075f, 0.5075f, 0.5075f, 1};
+    float matSpeSilver[4] = {0.5083f, 0.5083f, 0.5083f, 1};
+    float matShiSilver = 51.2f;
+
+    //light source
+    // white light properties
+    float globalAmbient[4] = {0.7f, 0.7f, 0.7f, 1.0f };
+
+    float lightAmbient[4]  = {0.0f, 0.0f, 0.0f, 1.0f };
+    float lightDiffuse[4]  = {1.0f, 1.0f, 1.0f, 1.0f };
+    float lightSpecular[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+
+    glm::vec3 currentLightPos, lightPosV; // light position as Vector3f, in both model and view space
+    float lightPos[3];
+
+
     // Mantiene la ventana abierta, mientras el usuario no cierre la ventana
     while(!glfwWindowShouldClose(window))
     {
@@ -320,7 +414,44 @@ int main()
         //Tomando del codigo visto en clase para cada vertice, en este caso quiero
         //que se mueva todo el objeto junto con la gravedad para abajo
         //poreso solo calculo una velocidad y se la aplico a todos los vertices
+        GLuint mvLoc = glGetUniformLocation(shaderProgram, "mvMat");
+        //luz algo
+        glm::mat4 viewMat = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -7.f)); //cam/>for all objects (scene)
+        auto modelMatPy = glm::translate(glm::mat4(1.f), glm::vec3(0.f, -2.f, 0.f)); //obj->pyramid
+        auto mvMat = viewMat*modelMatPy;
+        glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+        //luces
+        GLuint globalAmbLoc, ambLoc, diffLoc, specLoc, posLoc, mAmbLoc, mDiffLoc, mSpecLoc, mShiLoc;
+        globalAmbLoc = glGetUniformLocation(shaderProgram, "globalAmbient");
+        ambLoc = glGetUniformLocation(shaderProgram, "light.ambient");
+        diffLoc = glGetUniformLocation(shaderProgram, "light.diffuse");
+        specLoc = glGetUniformLocation(shaderProgram, "light.specular");
+        posLoc = glGetUniformLocation(shaderProgram, "light.position");
+        mAmbLoc = glGetUniformLocation(shaderProgram, "material.ambient");
+        mDiffLoc = glGetUniformLocation(shaderProgram, "material.diffuse");
+        mSpecLoc = glGetUniformLocation(shaderProgram, "material.specular");
+        mShiLoc = glGetUniformLocation(shaderProgram, "material.shininess");
+        GLuint nLoc = glGetUniformLocation(shaderProgram, "norm_matrix");
 
+        currentLightPos = glm::vec3(5.0f, 5.0f, 2.0f);
+        lightPosV = glm::vec3(viewMat * glm::vec4(currentLightPos, 1.0));
+        lightPos[0] = lightPosV.x;
+        lightPos[1] = lightPosV.y;
+        lightPos[2] = lightPosV.z;
+        glm::mat4 invTrMat = glm::transpose(glm::inverse(mvMat)); //model-view for normals
+        glProgramUniform4fv(shaderProgram, globalAmbLoc, 1, globalAmbient);
+        glProgramUniform4fv(shaderProgram, ambLoc, 1, lightAmbient);
+        glProgramUniform4fv(shaderProgram, diffLoc, 1, lightDiffuse);
+        glProgramUniform4fv(shaderProgram, specLoc, 1, lightSpecular);
+        glProgramUniform3fv(shaderProgram, posLoc, 1, lightPos);
+        glProgramUniform4fv(shaderProgram, mAmbLoc, 1, matAmbSilver);
+        glProgramUniform4fv(shaderProgram, mDiffLoc, 1, matDifSilver);
+        glProgramUniform4fv(shaderProgram, mSpecLoc, 1, matSpeSilver);
+        glProgramUniform1f(shaderProgram, mShiLoc, matShiSilver);
+        glUniformMatrix4fv(nLoc, 1, GL_FALSE, glm::value_ptr(invTrMat));
+
+
+        //gravedades
         velocities[0]  = velocities[0] + h*(gravity/mass[1]);
         //euler simple gravedad hacia abajo
         /*
@@ -422,8 +553,8 @@ int main()
 
 
         glBufferData(GL_ARRAY_BUFFER, vector.size() * sizeof(float)  , &vertices[0], GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
         glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glEnableVertexAttribArray(0);
 
         //aca uso los vertices para dibujar sale perfecto pero no son realmente la conexion de aristas
         //pero realmente es la que mas funciona me funciono probando mas de 20 obj
