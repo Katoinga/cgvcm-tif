@@ -194,7 +194,7 @@ glPopMatrix();
 }
 int main()
 {
-    /*
+
     const char* vertexShaderSrc =
             "#version 400\n"
             "in vec3 vp;"
@@ -204,8 +204,9 @@ int main()
                   "gl_Position = projMatrix * mvMatrix * vec4(vp, 1.0);"
             "}";
 
-*/
 
+//rotar camara
+    /*
     const char* vertexShaderSrc =
             "#version 400\n"
             "uniform mat4 projMat;" //projection
@@ -252,8 +253,8 @@ int main()
             "varyingColor = vec4((ambient + diffuse + specular), 1.0);"
             "gl_Position = projMat*mvMat*vec4(vertPos, 1.0);"
 
-            "}";
-    /*
+            "}";*/
+
     const char* fragmentShaderSrc =
             "#version 400\n"
             "out vec4 frag_color;"
@@ -261,8 +262,9 @@ int main()
             "uniform mat4 projMatrix;" //matriz de proyeccion
             "void main(){"
                   "frag_color = vec4(0.5, 0.5, 0.5, 0.5);"
-            "}";*/
-
+            "}";
+//rotar camara
+    /*
     const char* fragmentShaderSrc =
             "#version 400\n"
             "out vec4 color;"
@@ -271,7 +273,7 @@ int main()
             "{"
             "color = varyingColor;"
             "}";
-
+*/
 
 
 
@@ -316,9 +318,9 @@ int main()
     // OBJ
     //cambiar el path segun el file que se quiera leer
 
-    OBJFile obj("../lab2fin/cyber.obj");
+    //OBJFile obj("../lab2fin/cyber.obj");
     //OBJFile obj("/home/emilio/lab2fin/attic.obj");
-    //OBJFile obj("//home/sergio/cgvcm-tif/cyber.obj");
+    OBJFile obj("../cgvcm-tif/cyber.obj");
     //OBJFile obj("/home/emilio/lab2fin/bunny.obj");
 
     std::vector<float> vector = obj.GetVertices();
@@ -366,13 +368,15 @@ int main()
     float cameraY = 0.f;
     float cameraZ = 7.f;
 
-    int width, height;
     glm::mat4 mMat, vMat, mvMat, pMat;
     float angle=0;
 
     //projection
 
     int width, height;
+
+    //camera block
+
     glfwGetFramebufferSize(window, &width, &height);
     float aspect =static_cast<float>(width)/static_cast<float>(height);
     glm::mat4 projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
@@ -402,6 +406,7 @@ int main()
     float lightPos[3];
 
 
+    //camera block
     // Mantiene la ventana abierta, mientras el usuario no cierre la ventana
     while(!glfwWindowShouldClose(window))
     {
@@ -414,12 +419,17 @@ int main()
         //Tomando del codigo visto en clase para cada vertice, en este caso quiero
         //que se mueva todo el objeto junto con la gravedad para abajo
         //poreso solo calculo una velocidad y se la aplico a todos los vertices
-        GLuint mvLoc = glGetUniformLocation(shaderProgram, "mvMat");
+
+        //bloqueo camara luz
+/*
+        GLuint mvLoc2 = glGetUniformLocation(shaderProgram, "mvMat");
         //luz algo
+        //movimiento luz
+
         glm::mat4 viewMat = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -7.f)); //cam/>for all objects (scene)
         auto modelMatPy = glm::translate(glm::mat4(1.f), glm::vec3(0.f, -2.f, 0.f)); //obj->pyramid
         auto mvMat = viewMat*modelMatPy;
-        glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+        glUniformMatrix4fv(mvLoc2, 1, GL_FALSE, glm::value_ptr(mvMat));
         //luces
         GLuint globalAmbLoc, ambLoc, diffLoc, specLoc, posLoc, mAmbLoc, mDiffLoc, mSpecLoc, mShiLoc;
         globalAmbLoc = glGetUniformLocation(shaderProgram, "globalAmbient");
@@ -449,7 +459,8 @@ int main()
         glProgramUniform4fv(shaderProgram, mSpecLoc, 1, matSpeSilver);
         glProgramUniform1f(shaderProgram, mShiLoc, matShiSilver);
         glUniformMatrix4fv(nLoc, 1, GL_FALSE, glm::value_ptr(invTrMat));
-
+//bloqueo camara luz
+        /*
 
         //gravedades
         velocities[0]  = velocities[0] + h*(gravity/mass[1]);

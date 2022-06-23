@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(lab2fin LANGUAGES CXX)
+project(cgvcm-tif LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -10,7 +10,7 @@ find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 file(GLOB src "*.h"  "*.cpp" )
 
-add_executable(lab2fin main.cpp)
+add_executable(cgvcm-tif main.cpp)
 
 INCLUDE_DIRECTORIES(${QT_QTOPENGL_INCLUDE_DIRS}
                     ${OPENGL_INCLUDE_DIRS}
