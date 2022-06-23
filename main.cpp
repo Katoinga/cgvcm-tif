@@ -397,18 +397,18 @@ int main()
     // material de oro
     //material
 
-    /*float matAmbSilver[4] = {0.24725f,  0.1995f,   0.0745f, 1}; //RGB-A
+    float matAmbSilver[4] = {0.24725f,  0.1995f,   0.0745f, 1}; //RGB-A
     float matDifSilver[4] = {0.75164f,  0.60648f,  0.22648f, 1};
     float matSpeSilver[4] = {0.628281f, 0.555802f, 0.366065f, 1};
     float matShiSilver = 51.2f;
-    */
-    //material de plata
 
+    //material de plata
+/*
     float matAmbSilver[4] = {0.19225f,  0.19225f,  0.19225f, 1}; //RGB-A
     float matDifSilver[4] = {0.50754f,  0.50754f,  0.50754f, 1};
     float matSpeSilver[4] = {0.508273f, 0.508273f, 0.508273f, 1};
     float matShiSilver = 51.2f;
-
+*/
     //light source
     // white light properties
     float globalAmbient[4] = {0.7f, 0.7f, 0.7f, 1.0f };
@@ -509,6 +509,7 @@ int main()
                  vec3 acceleration = (gravity+spring-dampingForce)/mass[1];
                  velocity += acceleration;
                  vertices[i] += velocity;
+                 vertices[0] = glm::vec3(0,0,0);
          }
         }
         else if (count2 >=6){
@@ -524,6 +525,7 @@ int main()
                     vec3 acceleration = (gravity+spring-dampingForce)/mass[1];
                     velocity += acceleration;
                     vertices[i] -= velocity;
+                    vertices[0] = glm::vec3(0,0,0);
             }
             if (count3>=6){
                 count2=0;
