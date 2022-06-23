@@ -132,6 +132,7 @@ class OBJFile
 };
 
 //Autor > Emilio Valdivia
+//Autor > Sergio Soncco
 void WriteFrame(unsigned fillPosition,std::vector<glm::vec3> vertices){
     //solo guardo los 150 primeros frames por mi disco xd
         // solo estoy guardando vertices porque para un obj, los f que serian el contenido que se
@@ -195,18 +196,31 @@ glPopMatrix();
 int main()
 {
 
-    const char* vertexShaderSrc =
+    //Vertex shader para solo rotación
+   /* const char* vertexShaderSrc =
             "#version 400\n"
             "in vec3 vp;"
             "uniform mat4 mvMatrix;" // matriz de model-vista
             "uniform mat4 projMatrix;" //matriz de proyeccion
             "void main(){"
                   "gl_Position = projMatrix * mvMatrix * vec4(vp, 1.0);"
-            "}";
+            "}";*/
 
 
-//rotar camara
+
+    //Fragment shader solo para rotacion
     /*
+       const char* fragmentShaderSrc =
+               "#version 400\n"
+               "out vec4 frag_color;"
+               "uniform mat4 mvMatrix;" // matriz de model-vista
+               "uniform mat4 projMatrix;" //matriz de proyeccion
+               "void main(){"
+                     "frag_color = vec4(0.5, 0.5, 0.5, 0.5);"
+               "}";*/
+
+
+    //Vertex shader para rotación y iluminacion
     const char* vertexShaderSrc =
             "#version 400\n"
             "uniform mat4 projMat;" //projection
@@ -253,27 +267,21 @@ int main()
             "varyingColor = vec4((ambient + diffuse + specular), 1.0);"
             "gl_Position = projMat*mvMat*vec4(vertPos, 1.0);"
 
-            "}";*/
-
-    const char* fragmentShaderSrc =
-            "#version 400\n"
-            "out vec4 frag_color;"
-            "uniform mat4 mvMatrix;" // matriz de model-vista
-            "uniform mat4 projMatrix;" //matriz de proyeccion
-            "void main(){"
-                  "frag_color = vec4(0.5, 0.5, 0.5, 0.5);"
             "}";
-//rotar camara
-    /*
+
+
+    //Fragment shader para rotacion y iluminacion
     const char* fragmentShaderSrc =
             "#version 400\n"
             "out vec4 color;"
+            "uniform mat4 mvMatrix;" // matriz de model-vista
+            "uniform mat4 projMatrix;" //matriz de proyeccion
             "in vec4 varyingColor;"
             "void main()"
             "{"
             "color = varyingColor;"
             "}";
-*/
+
 
 
 
@@ -421,7 +429,7 @@ int main()
         //poreso solo calculo una velocidad y se la aplico a todos los vertices
 
         //bloqueo camara luz
-/*
+
         GLuint mvLoc2 = glGetUniformLocation(shaderProgram, "mvMat");
         //luz algo
         //movimiento luz
@@ -527,8 +535,8 @@ int main()
         //Rotate camera
 
         //Obtener las matrices
-        GLuint mvLoc    = glGetUniformLocation(shaderProgram, "mvMatrix");
-        GLuint projLoc  = glGetUniformLocation(shaderProgram, "projMatrix");
+        GLuint mvLoc    = glGetUniformLocation(shaderProgram, "mvMat");
+        GLuint projLoc  = glGetUniformLocation(shaderProgram, "projMat");
 
 
         //Obtener la perspectiva actual
