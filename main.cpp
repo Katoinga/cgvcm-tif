@@ -25,7 +25,11 @@ GLFWwindow* window;
 using namespace glm;
 
 using namespace std;
+/*
+NOTA>>> AVECES NO APARECE EL OBJETO QUE SE LEE UN CARRO, SIMPLEMENTE VOLVER A CORRER
+EL CODIGO O COMPROBAR LA RUTA
 
+*/
 class OBJFile
 {
     public:
@@ -139,7 +143,9 @@ void WriteFrame(unsigned fillPosition,std::vector<glm::vec3> vertices){
     // entrelaza se calculan mediante metodos que aun no hemos visto
     //como texturas y otras cosas.
         if(fillPosition <150){
-            std::string fileName  = "/home/emilio/lab2fin/frames/frame_"+std::to_string(fillPosition)+".obj";
+            //Si no funciona  colocar ruta global nose porque pasa eso
+            //std::string fileName  = "/home/emilio/qtfiles/cgvcm-tif/frames/frame_"+std::to_string(fillPosition)+".obj";
+            std::string fileName  = "../cgvcm-tif/frames/frame_"+std::to_string(fillPosition)+".obj";
 
             std::ofstream frame (fileName);
 
@@ -326,10 +332,9 @@ int main()
     // OBJ
     //cambiar el path segun el file que se quiera leer
 
-    //OBJFile obj("../lab2fin/cyber.obj");
-    //OBJFile obj("/home/emilio/lab2fin/attic.obj");
+    //OBJFile obj("../cgvcm-tif/attic.obj");
     OBJFile obj("../cgvcm-tif/cyber.obj");
-    //OBJFile obj("/home/emilio/lab2fin/bunny.obj");
+    //OBJFile obj("../cgvcm-tif/bunny.obj");
 
     std::vector<float> vector = obj.GetVertices();
     std::vector<glm::vec3> vertices;
@@ -502,7 +507,7 @@ int main()
         if (count2 < 100){
         count2++;
         count3=0;
-         for (int i=0;i<vertices.size();i++){
+         for (int i=0;i<vertices.size()-1;i++){
 
                  vec3 gravity = vec3(0, -0.098, 0)*dt;
                  vec3 spring = gravity*(vec3(0,0,0))*k*dt;
@@ -517,7 +522,7 @@ int main()
         }
         else if (count2 >=100){
             count3++;
-            for (int i=0;i<vertices.size();i++){
+            for (int i=0;i<vertices.size()-1;i++){
 
                     vec3 gravity = vec3(0, -0.098, 0)*dt;
                     vec3 spring = gravity*(vec3(0,0,0))*k*dt;
@@ -537,6 +542,7 @@ int main()
         time+=h;
         cont++;
         //guardo frame
+        //verificar ruta al inicio del codigo metodo writeframe
         //WriteFrame(cont,vertices);
 
 
