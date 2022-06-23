@@ -394,11 +394,11 @@ int main()
     //light
 
 
-    // SILVER material - ambient, diffuse, specular, and shininess
+    // material de oro
     //material
-    float matAmbSilver[4] = {0.1923f, 0.1923f, 0.1923f, 1}; //RGB-A
-    float matDifSilver[4] = {0.5075f, 0.5075f, 0.5075f, 1};
-    float matSpeSilver[4] = {0.5083f, 0.5083f, 0.5083f, 1};
+    float matAmbSilver[4] = {0.24725f,  0.1995f,   0.0745f, 1}; //RGB-A
+    float matDifSilver[4] = {0.75164f,  0.60648f,  0.22648f, 1};
+    float matSpeSilver[4] = {0.628281f, 0.555802f, 0.366065f, 1};
     float matShiSilver = 51.2f;
 
     //light source
@@ -423,7 +423,7 @@ int main()
         glClearColor(0.0, 0.0, 0.2, 1.0);
 
         glClear(GL_COLOR_BUFFER_BIT);
-        glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+        //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
         //Tomando del codigo visto en clase para cada vertice, en este caso quiero
         //que se mueva todo el objeto junto con la gravedad para abajo
         //poreso solo calculo una velocidad y se la aplico a todos los vertices
@@ -501,8 +501,6 @@ int main()
                  vec3 acceleration = (gravity+spring-dampingForce)/mass[1];
                  velocity += acceleration;
                  vertices[i] += velocity;
-
-
          }
         }
         else if (count2 >=6){
@@ -518,8 +516,6 @@ int main()
                     vec3 acceleration = (gravity+spring-dampingForce)/mass[1];
                     velocity += acceleration;
                     vertices[i] -= velocity;
-
-
             }
             if (count3>=6){
                 count2=0;
