@@ -497,11 +497,14 @@ int main()
 
         }*/
          //spring and dampers
-        if (count2 < 6){
+
+
+        if (count2 < 100){
         count2++;
+        count3=0;
          for (int i=0;i<vertices.size();i++){
 
-                 vec3 gravity = vec3(0, -0.98, 0)*dt;
+                 vec3 gravity = vec3(0, -0.098, 0)*dt;
                  vec3 spring = gravity*(vec3(0,0,0))*k*dt;
                  vec3 dampingForce = velocity*damping;
 
@@ -512,12 +515,11 @@ int main()
                  vertices[0] = glm::vec3(0,0,0);
          }
         }
-        else if (count2 >=6){
+        else if (count2 >=100){
             count3++;
-
             for (int i=0;i<vertices.size();i++){
 
-                    vec3 gravity = vec3(0, -0.98, 0)*dt;
+                    vec3 gravity = vec3(0, -0.098, 0)*dt;
                     vec3 spring = gravity*(vec3(0,0,0))*k*dt;
                     vec3 dampingForce = velocity*damping;
 
@@ -527,7 +529,7 @@ int main()
                     vertices[i] -= velocity;
                     vertices[0] = glm::vec3(0,0,0);
             }
-            if (count3>=6){
+            if (count3>=50){
                 count2=0;
             }
         }
